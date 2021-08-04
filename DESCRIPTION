@@ -1,0 +1,24 @@
+Package: glmSparse
+Title: Provides methods for sparse GLM models
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Daniel",
+           family = "Molitor",
+           role = c("aut", "cre"),
+           email = "molitdj97@gmail.com",
+           comment = c(website = "https://dmolitor.com"))
+Description: This package provides important S3 methods to evaluate and tidy sparse GLM models, as implemented in 
+    [MatrixModels](https://cran.r-project.org/web/packages/MatrixModels/MatrixModels.pdf).
+Depends:
+    R (>= 3.0.0),
+Imports:
+    broom,
+    dplyr,
+    Matrix (>= 1.1-5),
+    MatrixModels (>= 0.4),
+    tibble
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
