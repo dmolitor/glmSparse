@@ -127,7 +127,7 @@ summary.glpModel <- function (object,
   if (p > 0) {
     p1 <- 1L:p
     Qr <- object@pred@fac
-    coef.p <- MatrixModels::coef(object)[Matrix::expand(Qr)$P@perm[p1]]
+    coef.p <- MatrixModels::coef(object)[sort(Matrix::expand(Qr)$P@perm[p1])]
     covmat.unscaled <- Matrix::chol2inv(Qr)
     dimnames(covmat.unscaled) <- list(names(coef.p), names(coef.p))
     covmat <- dispersion * covmat.unscaled
