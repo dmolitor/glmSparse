@@ -44,33 +44,32 @@ Using one of the examples from the ModelMatrix [pdf](https://cran.r-project.org/
 we can see some comparison between GLM implementations.
 
 ```{r Comparison}
+library(broom)
 library(glmSparse)
+library(Matrix)
 
-## From example(glm): -----------------
-
-## Dobson (1990) Page 93: Randomized Controlled Trial :
-trial <- data.frame(counts=c(18,17,15,20,10,20,25,13,12),
-                        outcome=gl(3,1,9,labels=LETTERS[1:3]),
-                        treatment=gl(3,3,labels=letters[1:3]))
+x <- sparse.model.matrix(mpg ~ ., data = mtcars)
+y <- mtcars$mpg
 
 # stats::glm implementation
-glmDense <- glm(counts ~ outcome + treatment, 
-                family = poisson, 
-                data = trial)
-# glm4 implementation (sparse)
-glmSparse <- glm4(counts ~ outcome + treatment, 
-                  family = poisson, 
-                  data = trial,
-                  sparse = TRUE)
+glmBase <- glm(mpg ~ ., 
+               family = gaussian, 
+               data = mtcars)
+# glmSparse formula interface
+glmSparse_form <- glmSparse(mpg ~ .,
+                            family = gaussian,
+                            data = mtcars)
+# glmSparse alternate interface
+glmSparse_alt <- glmSparse(x = x,
+                           y = y,
+                           family = gaussian)
 
 # Compare the coefficient tables
-dplyr::mutate(broom::tidy(glmDense),
-              dplyr::across(where(is.numeric), round, digits = 7))
-dplyr::mutate(broom::tidy(glmDense),
-              dplyr::across(where(is.numeric), round, digits = 7))
+tidy(glmBase)
+tidy(glmSparse_form)
+tidy(glmSparse_alt)
 ```
-Although the results aren't numerically identical, they are identical when
-rounded to 7 digits, so their precision is exceedingly close.
+The results are identical!
 
 ## Why use this?
 

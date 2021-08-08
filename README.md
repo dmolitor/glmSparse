@@ -38,50 +38,75 @@ Using one of the examples from the ModelMatrix
 we can see some comparison between GLM implementations.
 
 ``` r
+library(broom)
 library(glmSparse)
+library(Matrix)
 
-## From example(glm): -----------------
-
-## Dobson (1990) Page 93: Randomized Controlled Trial :
-trial <- data.frame(counts=c(18,17,15,20,10,20,25,13,12),
-                        outcome=gl(3,1,9,labels=LETTERS[1:3]),
-                        treatment=gl(3,3,labels=letters[1:3]))
+x <- sparse.model.matrix(mpg ~ ., data = mtcars)
+y <- mtcars$mpg
 
 # stats::glm implementation
-glmDense <- glm(counts ~ outcome + treatment, 
-                family = poisson, 
-                data = trial)
-# glm4 implementation (sparse)
-glmSparse <- glm4(counts ~ outcome + treatment, 
-                  family = poisson, 
-                  data = trial,
-                  sparse = TRUE)
+glmBase <- glm(mpg ~ ., 
+               family = gaussian, 
+               data = mtcars)
+# glmSparse formula interface
+glmSparse_form <- glmSparse(mpg ~ .,
+                            family = gaussian,
+                            data = mtcars)
+# glmSparse alternate interface
+glmSparse_alt <- glmSparse(x = x,
+                           y = y,
+                           family = gaussian)
 
 # Compare the coefficient tables
-dplyr::mutate(broom::tidy(glmDense),
-              dplyr::across(where(is.numeric), round, digits = 7))
-#> # A tibble: 5 x 5
-#>   term        estimate std.error statistic p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-#> 1 (Intercept)    3.04      0.171     17.8   0     
-#> 2 outcomeB      -0.454     0.202     -2.25  0.0246
-#> 3 outcomeC      -0.293     0.193     -1.52  0.128 
-#> 4 treatmentb     0         0.2        0     1     
-#> 5 treatmentc     0         0.2        0     1
-dplyr::mutate(broom::tidy(glmDense),
-              dplyr::across(where(is.numeric), round, digits = 7))
-#> # A tibble: 5 x 5
-#>   term        estimate std.error statistic p.value
-#>   <chr>          <dbl>     <dbl>     <dbl>   <dbl>
-#> 1 (Intercept)    3.04      0.171     17.8   0     
-#> 2 outcomeB      -0.454     0.202     -2.25  0.0246
-#> 3 outcomeC      -0.293     0.193     -1.52  0.128 
-#> 4 treatmentb     0         0.2        0     1     
-#> 5 treatmentc     0         0.2        0     1
+tidy(glmBase)
+#> # A tibble: 11 x 5
+#>    term        estimate std.error statistic p.value
+#>    <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#>  1 (Intercept)  12.3      18.7        0.657  0.518 
+#>  2 cyl          -0.111     1.05      -0.107  0.916 
+#>  3 disp          0.0133    0.0179     0.747  0.463 
+#>  4 hp           -0.0215    0.0218    -0.987  0.335 
+#>  5 drat          0.787     1.64       0.481  0.635 
+#>  6 wt           -3.72      1.89      -1.96   0.0633
+#>  7 qsec          0.821     0.731      1.12   0.274 
+#>  8 vs            0.318     2.10       0.151  0.881 
+#>  9 am            2.52      2.06       1.23   0.234 
+#> 10 gear          0.655     1.49       0.439  0.665 
+#> 11 carb         -0.199     0.829     -0.241  0.812
+tidy(glmSparse_form)
+#> # A tibble: 11 x 5
+#>    term        estimate std.error statistic p.value
+#>    <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#>  1 (Intercept)  12.3      18.7        0.657  0.518 
+#>  2 cyl          -0.111     1.05      -0.107  0.916 
+#>  3 disp          0.0133    0.0179     0.747  0.463 
+#>  4 hp           -0.0215    0.0218    -0.987  0.335 
+#>  5 drat          0.787     1.64       0.481  0.635 
+#>  6 wt           -3.72      1.89      -1.96   0.0633
+#>  7 qsec          0.821     0.731      1.12   0.274 
+#>  8 vs            0.318     2.10       0.151  0.881 
+#>  9 am            2.52      2.06       1.23   0.234 
+#> 10 gear          0.655     1.49       0.439  0.665 
+#> 11 carb         -0.199     0.829     -0.241  0.812
+tidy(glmSparse_alt)
+#> # A tibble: 11 x 5
+#>    term        estimate std.error statistic p.value
+#>    <chr>          <dbl>     <dbl>     <dbl>   <dbl>
+#>  1 (Intercept)  12.3      18.7        0.657  0.518 
+#>  2 cyl          -0.111     1.05      -0.107  0.916 
+#>  3 disp          0.0133    0.0179     0.747  0.463 
+#>  4 hp           -0.0215    0.0218    -0.987  0.335 
+#>  5 drat          0.787     1.64       0.481  0.635 
+#>  6 wt           -3.72      1.89      -1.96   0.0633
+#>  7 qsec          0.821     0.731      1.12   0.274 
+#>  8 vs            0.318     2.10       0.151  0.881 
+#>  9 am            2.52      2.06       1.23   0.234 
+#> 10 gear          0.655     1.49       0.439  0.665 
+#> 11 carb         -0.199     0.829     -0.241  0.812
 ```
 
-Although the results aren’t numerically identical, they are identical
-when rounded to 7 digits, so their precision is exceedingly close.
+The results are identical!
 
 ## Why use this?
 
