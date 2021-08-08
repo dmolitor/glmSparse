@@ -211,7 +211,3 @@ tidy.glpModel <- function(x,
 #' @importFrom broom tidy
 #' @export
 broom::tidy
-
-#' @importFrom MatrixModels glm4
-#' @export
-MatrixModels::glm4

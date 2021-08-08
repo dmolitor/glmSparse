@@ -10,10 +10,11 @@ Authors@R:
 Description: This package provides important S3 methods to evaluate and tidy sparse GLM models, as implemented in 
     [MatrixModels](https://cran.r-project.org/web/packages/MatrixModels/MatrixModels.pdf).
 Depends:
-    R (>= 3.0.0),
+    R (>= 3.0.0)
 Imports:
     broom,
     dplyr,
+    methods,
     Matrix (>= 1.1-5),
     MatrixModels (>= 0.4),
     tibble
