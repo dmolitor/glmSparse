@@ -27,15 +27,14 @@ devtools::install_github("dmolitor/glmSparse")
 
 ## Sparse vs. Dense
 
-The primary feature of `glm4` is that it allows the user the create a
-sparse model matrix and fit a generalized linear model using this sparse
-matrix. In cases where the model matrix is highly sparse this will be
-much more memory/computationally efficient. For a more in-depth
-discussion of sparse matrices and their benefits, see [this
+The primary feature of `glmSparse()` is that it allows the user the
+create a sparse model matrix and fit a generalized linear model using
+this sparse matrix. In cases where the model matrix is highly sparse
+this will be much more memory/computationally efficient. For a more
+in-depth discussion of sparse matrices and their benefits, see [this
 write-up](https://cran.r-project.org/web/packages/Matrix/vignettes/sparseModels.pdf).
-Using one of the examples from the ModelMatrix
-[pdf](https://cran.r-project.org/web/packages/MatrixModels/MatrixModels.pdf)
-we can see some comparison between GLM implementations.
+Using a quick example we can confirm that the results of `glm()` and
+`glmSparse()` are the same.
 
 ``` r
 library(broom)
@@ -114,9 +113,9 @@ The primary reason to use this implementation is in the case of an
 extremely large model matrix that is fairly sparse that will cause
 memory issues if stored in standard dense format. When dealing with
 moderate sized datasets, there is little to no reason to prefer this
-vs. the `stats::glm` implementation. Additionally, I have done no
-comparison to the implementations found in the `speedglm` or `bigglm`
-packages; both of which claim to address similar situations, potentially
-with better results. If these packages indeed have faster
-implementations and can handle sparse model matrices equally well, there
-is no reason to utilize `glm4()`. In other words, this is tbd.
+vs. the `glm()` implementation. Additionally, I have done no comparison
+to the implementations found in the `speedglm` or `bigglm` packages;
+both of which claim to address similar situations, potentially with
+better results. If these packages indeed have faster implementations and
+can handle sparse model matrices equally well, there is no reason to
+utilize `glmSparse()`. In other words, this is tbd.
