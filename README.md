@@ -38,8 +38,10 @@ Using a quick example we can confirm that the results of `glm()` and
 
 ``` r
 library(broom)
+library(bench)
 library(glmSparse)
 library(Matrix)
+library(speedglm)
 
 x <- sparse.model.matrix(mpg ~ ., data = mtcars)
 y <- mtcars$mpg
@@ -107,15 +109,35 @@ tidy(glmSparse_alt)
 
 The results are identical!
 
-## Why use this?
+## Alternatives
 
-The primary reason to use this implementation is in the case of an
-extremely large model matrix that is fairly sparse that will cause
-memory issues if stored in standard dense format. When dealing with
-moderate sized datasets, there is little to no reason to prefer this
-vs. the `glm()` implementation. Additionally, I have done no comparison
-to the implementations found in the `speedglm` or `bigglm` packages;
-both of which claim to address similar situations, potentially with
-better results. If these packages indeed have faster implementations and
-can handle sparse model matrices equally well, there is no reason to
-utilize `glmSparse()`. In other words, this is tbd.
+The following example compares `glmSparse` to `glm` and `speedglm` using
+a sub-sample of the [PUMS data for the 1990
+census](https://www.census.gov/data/datasets/1990/dec/pums.html) to
+classify an individual’s sex. This provides a tractable example of a
+case where there will be significant sparsity, as each variable is coded
+as a factor variable, often with multiple levels. When fully expanded,
+the model matrix will be fairly sparse and `glmSparse` can take
+advantage of this. The following gives us a quick overview of the
+modeling data
+
+``` r
+str(pums_dat[, c(1, 4:7, 56)])
+#> tibble [50,000 x 6] (S3: tbl_df/tbl/data.frame)
+#>  $ dAge    : Factor w/ 8 levels "0","1","2","3",..: 6 7 4 5 8 2 2 5 7 4 ...
+#>  $ iAvail  : Factor w/ 5 levels "0","1","2","3",..: 1 1 1 1 1 1 1 1 1 1 ...
+#>  $ iCitizen: Factor w/ 5 levels "0","1","2","3",..: 1 1 1 1 1 1 1 1 1 1 ...
+#>  $ iClass  : Factor w/ 10 levels "0","1","2","3",..: 6 8 8 2 1 1 1 7 2 2 ...
+#>  $ dDepart : Factor w/ 6 levels "0","1","2","3",..: 4 6 5 4 1 1 1 1 1 1 ...
+#>  $ iSex    : num [1:50000] 1 1 1 1 1 1 0 1 1 0 ...
+```
+
+Using the `bench` package, we can benchmark the fitting time and memory
+usage of `glmSparse` compared to its `glm` and `speedglm` counterparts.
+
+    #> # A tibble: 3 x 7
+    #>   implementation      min   median mem_alloc n_itr  n_gc total_time
+    #>   <chr>          <bch:tm> <bch:tm> <bch:byt> <int> <dbl>   <bch:tm>
+    #> 1 glmSparse         226ms    253ms     104MB    25    43      6.58s
+    #> 2 speedglm          327ms    445ms     126MB    25    69     10.31s
+    #> 3 glm               464ms    512ms     194MB    25    90     13.84s

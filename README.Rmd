@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 # Load data for example regressions
 library(dplyr)
 library(readr)
-pums_dat <- read_delim("~/Documents/data/USCensus1990.data.txt", 
+pums_dat <- read_delim("~/../Downloads/USCensus1990.data.txt", 
                        delim = ",", 
                        n_max = 50000) %>%
   select(-caseid) %>%
@@ -86,11 +86,9 @@ The results are identical!
 
 ## Alternatives ##
 
-In this example, I will compare `glmSparse` to `glm` and `speedglm` using a 
-sub-sample of the [PUMS data for the 1990 census]
-(https://www.census.gov/data/datasets/1990/dec/pums.html) to
-predict an individual's sex. This simplified version of the data is a good
-example of a case where there will be significant sparsity, as each variable
+The following example compares `glmSparse` to `glm` and `speedglm` using a 
+sub-sample of the [PUMS data for the 1990 census](https://www.census.gov/data/datasets/1990/dec/pums.html) to classify an individual's sex. 
+This provides a tractable example of a case where there will be significant sparsity, as each variable
 is coded as a factor variable, often with multiple levels. When fully expanded,
 the model matrix will be fairly sparse and `glmSparse` can take advantage of
 this. The following gives us a quick overview of the modeling data
@@ -121,11 +119,13 @@ benchmarks <- mark(
              family = binomial())
     "Done!"
   })(),
-  iterations = 2
+  iterations = 25
 )
 
 # Performance
 benchmarks %>%
   mutate(implementation = c("glm", "glmSparse", "speedglm")) %>%
-  `[`(, c(14, 2:3, 5, 7:9))
+  `[`(, c(14, 2:3, 5, 7:9)) %>%
+  arrange(median) %>%
+  print()
 ```
