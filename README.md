@@ -135,9 +135,31 @@ str(pums_dat[, c(1, 4:7, 56)])
 Using the `bench` package, we can benchmark the fitting time and memory
 usage of `glmSparse` compared to its `glm` and `speedglm` counterparts.
 
-    #> # A tibble: 3 x 7
-    #>   implementation      min   median mem_alloc n_itr  n_gc total_time
-    #>   <chr>          <bch:tm> <bch:tm> <bch:byt> <int> <dbl>   <bch:tm>
-    #> 1 glmSparse         226ms    253ms     104MB    25    43      6.58s
-    #> 2 speedglm          327ms    445ms     126MB    25    69     10.31s
-    #> 3 glm               464ms    512ms     194MB    25    90     13.84s
+``` r
+benchmarks <- mark(
+  glm(iSex ~ .,
+        data = pums_dat[, c(1, 4:7, 56)],
+        family = binomial),
+  glmSparse(iSex ~ .,
+              data = pums_dat[, c(1, 4:7, 56)],
+              family = binomial),
+  speedglm(iSex ~ .,
+             data = pums_dat[, c(1, 4:7, 56)],
+             family = binomial()),
+  iterations = 100,
+  check = FALSE
+)
+
+# Arrange implementations from fastest (median) to slowest
+benchmarks %>%
+  mutate(implementation = c("glm", "glmSparse", "speedglm")) %>%
+  `[`(, c(14, 2:3, 5, 7:9)) %>%
+  arrange(median) %>%
+  print()
+#> # A tibble: 3 x 7
+#>   implementation      min   median mem_alloc n_itr  n_gc total_time
+#>   <chr>          <bch:tm> <bch:tm> <bch:byt> <int> <dbl>   <bch:tm>
+#> 1 glmSparse         218ms    257ms     104MB   100   157      26.3s
+#> 2 speedglm          259ms    326ms     126MB   100   211      34.6s
+#> 3 glm               469ms    596ms     194MB   100   393      57.4s
+```

@@ -99,30 +99,22 @@ str(pums_dat[, c(1, 4:7, 56)])
 Using the `bench` package, we can benchmark the fitting time and memory
 usage of `glmSparse` compared to its `glm` and `speedglm` counterparts.
 
-```{r Compare glm with glmSparse and speedglm, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Compare glm with glmSparse and speedglm, echo=TRUE, message=FALSE, warning=FALSE}
 benchmarks <- mark(
-  (function() {
-    glm(iSex ~ .,
+  glm(iSex ~ .,
         data = pums_dat[, c(1, 4:7, 56)],
-        family = binomial)
-    "Done!"
-  })(),
-  (function() {
-    glmSparse(iSex ~ .,
+        family = binomial),
+  glmSparse(iSex ~ .,
               data = pums_dat[, c(1, 4:7, 56)],
-              family = binomial)
-    "Done!"
-  })(),
-  (function() {
-    speedglm(iSex ~ .,
+              family = binomial),
+  speedglm(iSex ~ .,
              data = pums_dat[, c(1, 4:7, 56)],
-             family = binomial())
-    "Done!"
-  })(),
-  iterations = 25
+             family = binomial()),
+  iterations = 100,
+  check = FALSE
 )
 
-# Performance
+# Arrange implementations from fastest (median) to slowest
 benchmarks %>%
   mutate(implementation = c("glm", "glmSparse", "speedglm")) %>%
   `[`(, c(14, 2:3, 5, 7:9)) %>%
