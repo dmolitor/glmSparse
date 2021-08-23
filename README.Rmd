@@ -6,11 +6,22 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  warning = FALSE, 
+  message = FALSE,
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+# Load data for example regressions
+library(dplyr)
+library(readr)
+pums_dat <- read_delim("~/Documents/data/USCensus1990.data.txt", 
+                       delim = ",", 
+                       n_max = 50000) %>%
+  select(-caseid) %>%
+  mutate(across(.cols = -iSex, .fns = as.factor))
 ```
 
 # glmSparse
@@ -45,8 +56,10 @@ are the same.
 
 ```{r Comparison}
 library(broom)
+library(bench)
 library(glmSparse)
 library(Matrix)
+library(speedglm)
 
 x <- sparse.model.matrix(mpg ~ ., data = mtcars)
 y <- mtcars$mpg
@@ -71,14 +84,48 @@ tidy(glmSparse_alt)
 ```
 The results are identical!
 
-## Why use this?
+## Alternatives ##
 
-The primary reason to use this implementation is in the case of an extremely
-large model matrix that is fairly sparse that will cause memory issues if stored
-in standard dense format. When dealing with moderate sized datasets, there is little
-to no reason to prefer this vs. the `glm()` implementation. Additionally, I have
-done no comparison to the implementations found in the `speedglm` or `bigglm` packages;
-both of which claim to address similar situations, potentially with better results. If
-these packages indeed have faster implementations and can handle sparse model matrices
-equally well, there is no reason to utilize `glmSparse()`. In other words, this is tbd.
+In this example, I will compare `glmSparse` to `glm` and `speedglm` using a 
+sub-sample of the [PUMS data for the 1990 census]
+(https://www.census.gov/data/datasets/1990/dec/pums.html) to
+predict an individual's sex. This simplified version of the data is a good
+example of a case where there will be significant sparsity, as each variable
+is coded as a factor variable, often with multiple levels. When fully expanded,
+the model matrix will be fairly sparse and `glmSparse` can take advantage of
+this. The following gives us a quick overview of the modeling data
+```{r}
+str(pums_dat[, c(1, 4:7, 56)])
+```
 
+Using the `bench` package, we can benchmark the fitting time and memory
+usage of `glmSparse` compared to its `glm` and `speedglm` counterparts.
+
+```{r Compare glm with glmSparse and speedglm, echo=FALSE, message=FALSE, warning=FALSE}
+benchmarks <- mark(
+  (function() {
+    glm(iSex ~ .,
+        data = pums_dat[, c(1, 4:7, 56)],
+        family = binomial)
+    "Done!"
+  })(),
+  (function() {
+    glmSparse(iSex ~ .,
+              data = pums_dat[, c(1, 4:7, 56)],
+              family = binomial)
+    "Done!"
+  })(),
+  (function() {
+    speedglm(iSex ~ .,
+             data = pums_dat[, c(1, 4:7, 56)],
+             family = binomial())
+    "Done!"
+  })(),
+  iterations = 2
+)
+
+# Performance
+benchmarks %>%
+  mutate(implementation = c("glm", "glmSparse", "speedglm")) %>%
+  `[`(, c(14, 2:3, 5, 7:9))
+```
