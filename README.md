@@ -10,7 +10,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 <!-- badges: end -->
 
 The goal of glmSparse is to provide common methods such as `print`,
-`summary`, `broom::tidy`, for sparse/dense GLM models implemented in the
+`summary`, `broom::tidy`, for sparse GLM implemented in the
 [MatrixModels](https://cran.r-project.org/web/packages/MatrixModels/index.html)
 package. For more information on this particular implementation of GLM
 models, see the documentation for `MatrixModels::glm4()`.
