@@ -80,7 +80,7 @@
 <p>The primary feature of <code><a href="reference/glmSparse.html">glmSparse()</a></code> is that it allows the user the create a sparse model matrix and fit a generalized linear model using this sparse matrix. In cases where the model matrix is highly sparse this will be much more memory/computationally efficient. For a more in-depth discussion of sparse matrices and their benefits, see <a href="https://cran.r-project.org/web/packages/Matrix/vignettes/sparseModels.pdf">this write-up</a>. Using a quick example we can confirm that the results of <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code> and <code><a href="reference/glmSparse.html">glmSparse()</a></code> are the same.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/">broom</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">bench</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/bench">bench</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">glmSparse</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://Matrix.R-forge.R-project.org/">Matrix</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">speedglm</span><span class="op">)</span>
@@ -166,14 +166,14 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">benchmarks</span> <span class="op">&lt;-</span> <span class="fu">mark</span><span class="op">(</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span><span class="op">(</span><span class="va">iSex</span> <span class="op">~</span> <span class="va">.</span>,
-        data <span class="op">=</span> <span class="va">pums_dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">56</span><span class="op">)</span><span class="op">]</span>,
-        family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>,
+      data <span class="op">=</span> <span class="va">pums_dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">56</span><span class="op">)</span><span class="op">]</span>,
+      family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>,
   <span class="fu"><a href="reference/glmSparse.html">glmSparse</a></span><span class="op">(</span><span class="va">iSex</span> <span class="op">~</span> <span class="va">.</span>,
-              data <span class="op">=</span> <span class="va">pums_dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">56</span><span class="op">)</span><span class="op">]</span>,
-              family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>,
+            data <span class="op">=</span> <span class="va">pums_dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">56</span><span class="op">)</span><span class="op">]</span>,
+            family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>,
   <span class="fu">speedglm</span><span class="op">(</span><span class="va">iSex</span> <span class="op">~</span> <span class="va">.</span>,
-             data <span class="op">=</span> <span class="va">pums_dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">56</span><span class="op">)</span><span class="op">]</span>,
-             family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,
+           data <span class="op">=</span> <span class="va">pums_dat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">56</span><span class="op">)</span><span class="op">]</span>,
+           family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,
   iterations <span class="op">=</span> <span class="fl">100</span>,
   check <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span>
@@ -214,6 +214,7 @@
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://github.com/dmolitor/glmSparse/actions"><img src="https://github.com/dmolitor/glmSparse/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 </div>
