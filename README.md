@@ -7,6 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/dmolitor/glmSparse/workflows/R-CMD-check/badge.svg)](https://github.com/dmolitor/glmSparse/actions)
 <!-- badges: end -->
 
 The goal of glmSparse is to provide common methods such as `print`,
@@ -138,14 +139,14 @@ usage of `glmSparse` compared to its `glm` and `speedglm` counterparts.
 ``` r
 benchmarks <- mark(
   glm(iSex ~ .,
-        data = pums_dat[, c(1, 4:7, 56)],
-        family = binomial),
+      data = pums_dat[, c(1, 4:7, 56)],
+      family = binomial),
   glmSparse(iSex ~ .,
-              data = pums_dat[, c(1, 4:7, 56)],
-              family = binomial),
+            data = pums_dat[, c(1, 4:7, 56)],
+            family = binomial),
   speedglm(iSex ~ .,
-             data = pums_dat[, c(1, 4:7, 56)],
-             family = binomial()),
+           data = pums_dat[, c(1, 4:7, 56)],
+           family = binomial()),
   iterations = 100,
   check = FALSE
 )
