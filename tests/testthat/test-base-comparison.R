@@ -4,7 +4,6 @@ iris_x <- Matrix::sparse.model.matrix(Species ~ ., iris_new)
 iris_y <- as.integer(iris_new$Species == "virginica")
 iris_base <- as.data.frame(cbind("Species" = iris_y, as.matrix(iris_x)))
 wts <- sample(1:ncol(iris), nrow(iris), replace = TRUE)
-offset_vals <- sample(1:2, nrow(iris), replace = TRUE)
 
 # Tests -------------------------------------------------------------------
 
@@ -73,9 +72,10 @@ test_that("glmSparse and glm weighted binomial models are numerically identical"
 })
 
 test_that("glmSparse and glm binomial models with `offset` specified are numerically identical", {
-  iris_logit <- glmSparse(x = iris_x, y = iris_y, family = "binomial", offset = offset_vals)
+  offset_vals <- sample(1:2, nrow(iris), replace = TRUE)
+  iris_logit <- glmSparse(x = iris_x, y = iris_y, family = "binomial", offset = rep(1:2, nrow(iris)/2))
   iris_logit_base <- suppressWarnings(
-    glm(Species ~ . - 1, data = iris_base, family = "binomial", offset = as.numeric(offset_vals))
+    glm(Species ~ . - 1, data = iris_base, family = "binomial", offset = as.numeric(rep(1:2, nrow(iris)/2)))
   )
   expect_equal(
     unname(coef(iris_logit)),
