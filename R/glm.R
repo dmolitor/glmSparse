@@ -42,6 +42,8 @@
 #' @param x Alternate interface for modeling. An already-constructed sparse
 #'   model matrix (class 'dgCMatrix').
 #' @param y Alternate interface for modeling. A numeric response vector.
+#' @param drop.unused.levels Should factors have unused levels dropped? Defaults
+#'   to `FALSE`.
 #' @param ... Potentially arguments passed on to fitter functions; currently
 #'   unused.
 #' @return An object of class `glpModel`.
@@ -49,34 +51,41 @@
 #' @seealso [Matrix::sparse.model.matrix()] for information on creating sparse
 #'   model matrices, and [MatrixModels::glm4()] to understand more details on
 #'   the implementation.
-glmSparse <- function (formula,
-                       family = stats::gaussian,
-                       data,
-                       weights,
-                       subset,
-                       na.action,
-                       start = NULL,
-                       etastart,
-                       mustart,
-                       offset,
-                       doFit = TRUE,
-                       control = list(...),
-                       model = TRUE,
-                       contrasts = NULL,
-                       x,
-                       y,
-                       ...) {
-  if (missing(formula) && missing(data) && (missing(x) || missing(y))) {
+glmSparse <- function(formula = NULL,
+                      family = stats::gaussian,
+                      data = NULL,
+                      weights = NULL,
+                      subset = NULL,
+                      na.action = stats::na.fail,
+                      start = NULL,
+                      etastart = NULL,
+                      mustart = NULL,
+                      offset = NULL,
+                      doFit = TRUE,
+                      control = list(...),
+                      model = TRUE,
+                      contrasts = NULL,
+                      x = NULL,
+                      y = NULL,
+                      drop.unused.levels = FALSE,
+                      ...) {
+  if (is.null(formula) && is.null(data) && (is.null(x) || is.null(y))) {
     stop("If no formula is supplied, both `x` and `y` must be supplied", call. = FALSE)
   }
-  if (!missing(offset) && !is.null(offset) && is.numeric(offset)) {
+  if (is.null(na.action)) na.action <- stats::na.fail
+  if (!identical(na.action, stats::na.fail)) {
+    stop("`na.action` must be `stats::na.fail` - deal with NAs earlier ;)", call. = FALSE)
+  }
+  if (!is.null(offset) && !is.null(offset) && is.numeric(offset)) {
     offset <- as.numeric(offset)
   }
+  if (is.null(family)) {
+    family  <- stats::gaussian
+  }
   sparse <- TRUE
-  drop.unused.levels <- TRUE
   call <- match.call()
   # If x and y are provided and formula is empty, then use the provided x & y
-  if (!missing(x) && !missing(y) && missing(formula)) {
+  if (!is.null(x) && !is.null(y) && is.null(formula)) {
     if (!inherits(x, "dgCMatrix")) {
       stop(paste0("\nCurrently `x` is only supported as a sparse matrix.\nTo create",
                   " a sparse model matrix, see `Matrix::sparse.model.matrix`.\n",
@@ -96,7 +105,7 @@ glmSparse <- function (formula,
     call$x <- NULL
     call$y <- NULL
   }
-  if (missing(family)) {
+  if (is.null(family)) {
     stop("`family` must be specified", call. = FALSE)
   } else {
     if (is.character(family)) {
@@ -110,9 +119,9 @@ glmSparse <- function (formula,
       stop("'family' not recognized")
     }
   }
-  if (!missing(x) && !missing(y) && missing(formula)) {
-    if (missing(weights)) weights <- NULL
-    if (missing(offset)) offset <- NULL
+  if (!is.null(x) && !is.null(y) && is.null(formula)) {
+    if (is.null(weights)) weights <- NULL
+    if (is.null(offset)) offset <- NULL
     model_resp <- as_respMod(x = x,
                              y = y,
                              weights = weights,
@@ -120,8 +129,8 @@ glmSparse <- function (formula,
                              family = family)
     model_pred <- as_predModule(dgC_to_dsparseModel(x))
   } else {
-    if (missing(data)) {
-      stop(paste0("When `formula` is provided, `data` should never be missing.",
+    if (is.null(data)) {
+      stop(paste0("When `formula` is provided, `data` should never be is.null.",
                   " To use an already-created model matrix and response variable,",
                   " provide these data in the `x` and `y` arguments, respectively."),
            call. = FALSE)

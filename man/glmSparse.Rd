@@ -5,22 +5,23 @@
 \title{Fitting sparse Generalized Linear Models}
 \usage{
 glmSparse(
-  formula,
+  formula = NULL,
   family = stats::gaussian,
-  data,
-  weights,
-  subset,
-  na.action,
+  data = NULL,
+  weights = NULL,
+  subset = NULL,
+  na.action = stats::na.fail,
   start = NULL,
-  etastart,
-  mustart,
-  offset,
+  etastart = NULL,
+  mustart = NULL,
+  offset = NULL,
   doFit = TRUE,
   control = list(...),
   model = TRUE,
   contrasts = NULL,
-  x,
-  y,
+  x = NULL,
+  y = NULL,
+  drop.unused.levels = FALSE,
   ...
 )
 }
@@ -75,6 +76,9 @@ than one is specified, their sum is used. See \link{model.offset}.}
 model matrix (class 'dgCMatrix').}
 
 \item{y}{Alternate interface for modeling. A numeric response vector.}
+
+\item{drop.unused.levels}{Should factors have unused levels dropped? Defaults
+to \code{FALSE}.}
 
 \item{...}{Potentially arguments passed on to fitter functions; currently
 unused.}
