@@ -38,26 +38,39 @@ this function’s functionality and make the methods that I wished it had.
 
 ## Alternatives
 
-Here are the alternatives I’m aware of: - `glmnet::bigGlm` This works
-fine actually for estimating model parameters and making predictions,
-but because it’s not finding a closed-form solution it doesn’t
-out-of-the-box come with features that I would typically want
-(e.g. standard errors). It also doesn’t really have any of the standard
-methods you come to expect with `glm` such as `fitted`, `resid`,
-`summary`, etc. - `speedglm::speedglm` This option is confusing to me
-particularly because it has an argument `sparse` with the following
-description: “logical. Is the model matrix sparse? By default is NULL,
-so a quickly sample survey will be made.” However, the function does not
-allow the user to input sparse matrices from the `Matrix` package.
-Additionally, under the hood it is using `model.matrix` to create the
-underlying modeling matrix which is the exact step I’m trying to avoid
-(e.g. by using `Matrix::sparse.model.matrix`). It is possible that this
-function will allow sparse matrix classes from a different package
-(e.g. `SparseM`), but even if it does that’s not a great solution IMO
-because the `Matrix` implementation of sparse matrices are by far the
-most ubiquitous and I don’t really want to veer from that. - `glm` Not
-meant to support sparse matrices. - IDK I’m potentially missing a good
-option here out of ignorance?
+Here are the alternatives I’m aware of:
+
+-   `glmnet::bigGlm`
+
+    This works fine actually for estimating model parameters and making
+    predictions, but because it’s not finding a closed-form solution it
+    doesn’t out-of-the-box come with features that I would typically
+    want (e.g. standard errors). It also doesn’t really have any of the
+    standard methods you come to expect with `glm` such as `fitted`,
+    `resid`, `summary`, etc.
+
+-   `speedglm::speedglm`
+
+    This option is confusing to me particularly because it has an
+    argument `sparse` with the following description: “logical. Is the
+    model matrix sparse? By default is NULL, so a quickly sample survey
+    will be made.” However, the function does not allow the user to
+    input sparse matrices from the `Matrix` package. Additionally, under
+    the hood it is using `model.matrix` to create the underlying
+    modeling matrix which is the exact step I’m trying to avoid (e.g. by
+    using `Matrix::sparse.model.matrix`). It is possible that this
+    function will allow sparse matrix classes from a different package
+    (e.g. `SparseM`), but even if it does that’s not a great solution
+    IMO because the `Matrix` implementation of sparse matrices are by
+    far the most ubiquitous and I don’t really want to veer from that.
+
+-   `glm`
+
+    Not meant to support sparse matrices.
+
+-   IDK
+
+    I’m potentially missing a good option here out of ignorance?
 
 Assuming I’m not missing out on anything obvious here, none of the
 options above provide a suitable solution to the issue, which is
@@ -251,7 +264,7 @@ bench::mark(
 #> # A tibble: 3 x 5
 #>        min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1    10.9s    10.9s    0.0920    3.94GB    1.20 
-#> 2    12.3s    12.3s    0.0814    4.49GB    0.976
-#> 3    21.7s    21.7s    0.0460    8.89GB    1.38
+#> 1    11.1s    11.1s    0.0901    3.94GB    1.17 
+#> 2    21.4s    21.4s    0.0466    4.49GB    0.559
+#> 3    24.9s    24.9s    0.0401    8.89GB    1.20
 ```
