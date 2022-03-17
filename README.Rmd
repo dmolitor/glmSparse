@@ -50,7 +50,7 @@ this function's functionality and make the methods that I wished it had.
 
 Here are the alternatives I'm aware of:
 
-- `glmnet::bigGlm`
+- **glmnet::bigGlm**
   
   This works fine actually for estimating model parameters and making 
   predictions, but because it's not finding a closed-form solution it doesn't 
@@ -58,7 +58,7 @@ Here are the alternatives I'm aware of:
   errors). It also doesn't really have any of the standard methods you come to
   expect with `glm` such as `fitted`, `resid`, `summary`, etc.
   
-- `speedglm::speedglm`
+- **speedglm::speedglm**
   
   This option is confusing to me particularly because it has an argument
   `sparse` with the following description: "logical. Is the model matrix 
@@ -72,11 +72,11 @@ Here are the alternatives I'm aware of:
   because the `Matrix` implementation of sparse matrices are by far the most 
   ubiquitous and I don't really want to veer from that.
 
-- `glm`
+- **glm**
   
   Not meant to support sparse matrices.
   
-- IDK
+- **Others**
 
   I'm potentially missing a good option here out of ignorance?
    
