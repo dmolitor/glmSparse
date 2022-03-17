@@ -70,7 +70,25 @@
 <div class="section level2">
 <h2 id="alternatives">Alternatives<a class="anchor" aria-label="anchor" href="#alternatives"></a>
 </h2>
-<p>Here are the alternatives I’m aware of: - <code>glmnet::bigGlm</code> This works fine actually for estimating model parameters and making predictions, but because it’s not finding a closed-form solution it doesn’t out-of-the-box come with features that I would typically want (e.g. standard errors). It also doesn’t really have any of the standard methods you come to expect with <code>glm</code> such as <code>fitted</code>, <code>resid</code>, <code>summary</code>, etc. - <code>speedglm::speedglm</code> This option is confusing to me particularly because it has an argument <code>sparse</code> with the following description: “logical. Is the model matrix sparse? By default is NULL, so a quickly sample survey will be made.” However, the function does not allow the user to input sparse matrices from the <code>Matrix</code> package. Additionally, under the hood it is using <code>model.matrix</code> to create the underlying modeling matrix which is the exact step I’m trying to avoid (e.g. by using <code><a href="https://rdrr.io/pkg/Matrix/man/sparse.model.matrix.html" class="external-link">Matrix::sparse.model.matrix</a></code>). It is possible that this function will allow sparse matrix classes from a different package (e.g. <code>SparseM</code>), but even if it does that’s not a great solution IMO because the <code>Matrix</code> implementation of sparse matrices are by far the most ubiquitous and I don’t really want to veer from that. - <code>glm</code> Not meant to support sparse matrices. - IDK I’m potentially missing a good option here out of ignorance?</p>
+<p>Here are the alternatives I’m aware of:</p>
+<ul>
+<li>
+<p><code>glmnet::bigGlm</code></p>
+<p>This works fine actually for estimating model parameters and making predictions, but because it’s not finding a closed-form solution it doesn’t out-of-the-box come with features that I would typically want (e.g. standard errors). It also doesn’t really have any of the standard methods you come to expect with <code>glm</code> such as <code>fitted</code>, <code>resid</code>, <code>summary</code>, etc.</p>
+</li>
+<li>
+<p><code>speedglm::speedglm</code></p>
+<p>This option is confusing to me particularly because it has an argument <code>sparse</code> with the following description: “logical. Is the model matrix sparse? By default is NULL, so a quickly sample survey will be made.” However, the function does not allow the user to input sparse matrices from the <code>Matrix</code> package. Additionally, under the hood it is using <code>model.matrix</code> to create the underlying modeling matrix which is the exact step I’m trying to avoid (e.g. by using <code><a href="https://rdrr.io/pkg/Matrix/man/sparse.model.matrix.html" class="external-link">Matrix::sparse.model.matrix</a></code>). It is possible that this function will allow sparse matrix classes from a different package (e.g. <code>SparseM</code>), but even if it does that’s not a great solution IMO because the <code>Matrix</code> implementation of sparse matrices are by far the most ubiquitous and I don’t really want to veer from that.</p>
+</li>
+<li>
+<p><code>glm</code></p>
+<p>Not meant to support sparse matrices.</p>
+</li>
+<li>
+<p>IDK</p>
+<p>I’m potentially missing a good option here out of ignorance?</p>
+</li>
+</ul>
 <p>Assuming I’m not missing out on anything obvious here, none of the options above provide a suitable solution to the issue, which is presumably why the <code><a href="https://rdrr.io/pkg/MatrixModels/man/glm4.html" class="external-link">MatrixModels::glm4</a></code> function was created in the first place!</p>
 </div>
 <div class="section level2">
@@ -240,9 +258,9 @@
 <span class="co">#&gt; # A tibble: 3 x 5</span>
 <span class="co">#&gt;        min   median `itr/sec` mem_alloc `gc/sec`</span>
 <span class="co">#&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1    10.9s    10.9s    0.0920    3.94GB    1.20 </span>
-<span class="co">#&gt; 2    12.3s    12.3s    0.0814    4.49GB    0.976</span>
-<span class="co">#&gt; 3    21.7s    21.7s    0.0460    8.89GB    1.38</span></code></pre></div>
+<span class="co">#&gt; 1    11.1s    11.1s    0.0901    3.94GB    1.17 </span>
+<span class="co">#&gt; 2    21.4s    21.4s    0.0466    4.49GB    0.559</span>
+<span class="co">#&gt; 3    24.9s    24.9s    0.0401    8.89GB    1.20</span></code></pre></div>
 </div>
 </div>
   </div>
