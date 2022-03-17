@@ -55,22 +55,23 @@ underlying implementation, see <code><a href="https://rdrr.io/pkg/MatrixModels/m
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">glmSparse</span><span class="op">(</span>
-  <span class="va">formula</span>,
+  formula <span class="op">=</span> <span class="cn">NULL</span>,
   family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span>,
-  <span class="va">data</span>,
-  <span class="va">weights</span>,
-  <span class="va">subset</span>,
-  <span class="va">na.action</span>,
+  data <span class="op">=</span> <span class="cn">NULL</span>,
+  weights <span class="op">=</span> <span class="cn">NULL</span>,
+  subset <span class="op">=</span> <span class="cn">NULL</span>,
+  na.action <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.fail</a></span>,
   start <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">etastart</span>,
-  <span class="va">mustart</span>,
-  <span class="va">offset</span>,
+  etastart <span class="op">=</span> <span class="cn">NULL</span>,
+  mustart <span class="op">=</span> <span class="cn">NULL</span>,
+  offset <span class="op">=</span> <span class="cn">NULL</span>,
   doFit <span class="op">=</span> <span class="cn">TRUE</span>,
   control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>,
   model <span class="op">=</span> <span class="cn">TRUE</span>,
   contrasts <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">x</span>,
-  <span class="va">y</span>,
+  x <span class="op">=</span> <span class="cn">NULL</span>,
+  y <span class="op">=</span> <span class="cn">NULL</span>,
+  drop.unused.levels <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -128,6 +129,9 @@ than one is specified, their sum is used. See <a href="https://rdrr.io/r/stats/m
 model matrix (class 'dgCMatrix').</p></dd>
 <dt>y</dt>
 <dd><p>Alternate interface for modeling. A numeric response vector.</p></dd>
+<dt>drop.unused.levels</dt>
+<dd><p>Should factors have unused levels dropped? Defaults
+to <code>FALSE</code>.</p></dd>
 <dt>...</dt>
 <dd><p>Potentially arguments passed on to fitter functions; currently
 unused.</p></dd>
