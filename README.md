@@ -40,7 +40,7 @@ this function’s functionality and make the methods that I wished it had.
 
 Here are the alternatives I’m aware of:
 
--   `glmnet::bigGlm`
+-   **glmnet::bigGlm**
 
     This works fine actually for estimating model parameters and making
     predictions, but because it’s not finding a closed-form solution it
@@ -49,7 +49,7 @@ Here are the alternatives I’m aware of:
     standard methods you come to expect with `glm` such as `fitted`,
     `resid`, `summary`, etc.
 
--   `speedglm::speedglm`
+-   **speedglm::speedglm**
 
     This option is confusing to me particularly because it has an
     argument `sparse` with the following description: “logical. Is the
@@ -64,11 +64,11 @@ Here are the alternatives I’m aware of:
     IMO because the `Matrix` implementation of sparse matrices are by
     far the most ubiquitous and I don’t really want to veer from that.
 
--   `glm`
+-   **glm**
 
     Not meant to support sparse matrices.
 
--   IDK
+-   **Others**
 
     I’m potentially missing a good option here out of ignorance?
 
@@ -264,7 +264,7 @@ bench::mark(
 #> # A tibble: 3 x 5
 #>        min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1    11.1s    11.1s    0.0901    3.94GB    1.17 
-#> 2    21.4s    21.4s    0.0466    4.49GB    0.559
-#> 3    24.9s    24.9s    0.0401    8.89GB    1.20
+#> 1    13.7s    13.7s    0.0732    3.94GB    0.951
+#> 2    11.8s    11.8s    0.0844    4.49GB    1.01 
+#> 3    22.5s    22.5s    0.0444    8.89GB    1.33
 ```
