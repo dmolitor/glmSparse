@@ -139,3 +139,12 @@ exponentiate <- function(data) {
   }
   data
 }
+
+# Convert '('s in column names to '.' - make them syntactic!!
+syntactic_names <- function(x) {
+  cnames <- colnames(x)
+  stopifnot(is.character(cnames), !identical(cnames, character(0)))
+  cnames <- gsub("\\(|\\)", "\\.", cnames)
+  colnames(x) <- cnames
+  x
+}

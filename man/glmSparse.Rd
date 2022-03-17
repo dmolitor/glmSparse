@@ -6,7 +6,7 @@
 \usage{
 glmSparse(
   formula,
-  family,
+  family = stats::gaussian,
   data,
   weights,
   subset,

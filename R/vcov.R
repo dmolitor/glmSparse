@@ -1,7 +1,7 @@
 #' @method vcov glpModel
 #' @export
 vcov.glpModel <- function (object, complete = TRUE, ...) {
-  vcov.summary.glpModel(summary.glpModel(object, ...), complete = complete)
+  stats::vcov(summary(object, ...), complete = complete)
 }
 
 #' @method vcov summary.glpModel

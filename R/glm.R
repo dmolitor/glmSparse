@@ -50,7 +50,7 @@
 #'   model matrices, and [MatrixModels::glm4()] to understand more details on
 #'   the implementation.
 glmSparse <- function (formula,
-                       family,
+                       family = stats::gaussian,
                        data,
                        weights,
                        subset,
@@ -68,6 +68,9 @@ glmSparse <- function (formula,
                        ...) {
   if (missing(formula) && missing(data) && (missing(x) || missing(y))) {
     stop("If no formula is supplied, both `x` and `y` must be supplied", call. = FALSE)
+  }
+  if (!missing(offset) && !is.null(offset) && is.numeric(offset)) {
+    offset <- as.numeric(offset)
   }
   sparse <- TRUE
   drop.unused.levels <- TRUE
@@ -94,7 +97,7 @@ glmSparse <- function (formula,
     call$y <- NULL
   }
   if (missing(family)) {
-    family <- NULL
+    stop("`family` must be specified", call. = FALSE)
   } else {
     if (is.character(family)) {
       family <- get(family, mode = "function", envir = parent.frame())
@@ -132,9 +135,11 @@ glmSparse <- function (formula,
     mf[[1L]] <- as.name("model.frame")
     mf <- eval(mf, parent.frame())
     model_resp <- mkRespMod(mf, family)
+    mt <- attr(mf, "terms")
     model_pred <- as(
-      MatrixModels::model.Matrix(formula,
+      MatrixModels::model.Matrix(mt,
                                  mf,
+                                 contrasts,
                                  sparse = sparse,
                                  drop.unused.levels = drop.unused.levels),
       "predModule"
@@ -150,3 +155,78 @@ glmSparse <- function (formula,
     return(ans)
   }
 }
+
+#' @rdname show-methods
+#' @aliases show,glpModel,ANY-method
+setMethod(
+  "show",
+  "glpModel",
+  function(object) {
+    digits = max(3L, getOption("digits") - 3L)
+    df.null <- object@pred@X@Dim[[1L]] - 1L
+    df.residual <- df.null - (object@pred@X@Dim[[2L]] - 1L)
+    rank <- as.vector(Matrix::rankMatrix(object@pred@X, method = "qr.R"))
+    intercept <- any(object@pred@X@assign == 0)
+    wtdmu <- if (intercept) {
+      sum(object@resp@weights * object@resp@y)/sum(object@resp@weights)
+    } else {
+      object@resp@family$linkinv(object@resp@offset)
+    }
+    dev <- sum(
+      object@resp@family$dev.resids(y = object@resp@y,
+                               mu = object@resp@mu,
+                               wt = object@resp@weights)
+    )
+    nulldev <- sum(
+      object@resp@family$dev.resids(y = object@resp@y,
+                               mu = wtdmu,
+                               wt = object@resp@weights)
+    )
+    aic <- object@resp@family$aic(y = object@resp@y,
+                             n = object@resp@n,
+                             mu = object@resp@mu,
+                             wt = object@resp@weights,
+                             dev = dev) + 2 * rank
+    cat(
+      "\nCall:  ",
+      paste(deparse(object@call),
+            sep = "\n",
+            collapse = "\n"),
+      "\n\n",
+      sep = ""
+    )
+    if (length(MatrixModels::coef(object))) {
+      cat("Coefficients")
+      if (is.character(co <- object@pred@X@contrasts))
+        cat(
+          "  [contrasts: ",
+          apply(cbind(names(co), co), 1L, paste, collapse = "="),
+          "]"
+        )
+      cat(":\n")
+      print.default(
+        format(MatrixModels::coef(object),
+               digits = digits),
+        print.gap = 2,
+        quote = FALSE
+      )
+    } else {
+      cat("No coefficients\n\n")
+    }
+    cat(
+      "\nDegrees of Freedom:",
+      df.null, "Total (i.e. Null); ",
+      df.residual, "Residual\n"
+    )
+    cat(
+      "Null Deviance:\t   ",
+      format(signif(nulldev, digits)),
+      "\nResidual Deviance:",
+      format(signif(dev, digits)),
+      "\tAIC:",
+      format(signif(aic, digits))
+    )
+    cat("\n")
+    invisible(object)
+  }
+)

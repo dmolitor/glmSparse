@@ -12,7 +12,7 @@ confint.glpModel <- function (object, parm, level = 0.95, ...) {
   pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
   fac <- stats::qnorm(a)
   ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
-  ses <- sqrt(diag(vcov.glpModel(object)))[parm]
+  ses <- sqrt(diag(stats::vcov(object)))[parm]
   ci[] <- cf[parm] + outer(ses, fac)
   ci
 }
