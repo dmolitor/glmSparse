@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">glmSparse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -60,7 +60,6 @@
 <div class="page-header"><h1 id="glmsparse">glmSparse<a class="anchor" aria-label="anchor" href="#glmsparse"></a>
 </h1></div>
 <!-- badges: start -->
-
 <p>The goal of glmSparse is to provide common methods such as <code>coef</code>, <code>summary</code>, <code>predict</code>, <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy</a></code>, etc. for sparse GLMs implemented in the <a href="https://cran.r-project.org/web/packages/MatrixModels/index.html" class="external-link">MatrixModels</a> package. For more information on this particular implementation of GLMs, see the documentation for <code><a href="https://rdrr.io/pkg/MatrixModels/man/glm4.html" class="external-link">MatrixModels::glm4</a></code>. Additionally, glmSparse extends <code><a href="https://rdrr.io/pkg/MatrixModels/man/glm4.html" class="external-link">MatrixModels::glm4</a></code> to allow the user to both fit GLMs using the formula syntax of base R’s <code>glm</code> function as well as directly passing in a pre-formulated sparse model matrix and response vector (sparse matrices as defined by the <code>Matrix</code> package implementation).</p>
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
@@ -96,8 +95,8 @@
 </h2>
 <p>You can install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dmolitor/glmSparse"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dmolitor/glmSparse"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -105,162 +104,162 @@
 <p>In this example we’ll use the <code><a href="https://dplyr.tidyverse.org/reference/starwars.html" class="external-link">dplyr::starwars</a></code> dataset which has characteristics of a bunch of Star Wars characters, and we’ll run a simple logistic regression to predict the characters’ genders. This will showcase the alternate modeling interfaces as well as the standard modeling methods.</p>
 <p>First, we’ll do a tiny bit of data cleaning and we’ll also create a sparse modeling matrix and response vector.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">glmSparse</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span>
-
-<span class="co"># Prep the data for modeling</span>
-<span class="va">starwars_clean</span> <span class="op">&lt;-</span> <span class="va">starwars</span> |&gt;
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">height</span><span class="op">:</span><span class="va">eye_color</span>, <span class="va">gender</span><span class="op">)</span> |&gt;
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span><span class="op">)</span> |&gt;
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>
-    gender <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">.x</span>, exclude <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"color"</span><span class="op">)</span>, <span class="op">~</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu">fct_lump_min</span><span class="op">(</span><span class="va">.x</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">height</span>, <span class="va">mass</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/replace.html" class="external-link">replace</a></span><span class="op">(</span><span class="va">.x</span>, <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">.x</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-  <span class="op">)</span>
-
-<span class="co"># Pre-create sparse modeling matrix</span>
-<span class="va">starwars_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparse.model.matrix.html" class="external-link">sparse.model.matrix</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">starwars_clean</span><span class="op">)</span>
-<span class="va">starwars_y</span> <span class="op">&lt;-</span> <span class="va">starwars_clean</span><span class="op">$</span><span class="va">gender</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">glmSparse</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Prep the data for modeling</span></span>
+<span><span class="va">starwars_clean</span> <span class="op">&lt;-</span> <span class="va">starwars</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">height</span><span class="op">:</span><span class="va">eye_color</span>, <span class="va">gender</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    gender <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">gender</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>,</span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu">where</span><span class="op">(</span><span class="va">is.character</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">.x</span>, exclude <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"color"</span><span class="op">)</span>, <span class="op">~</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu">fct_lump_min</span><span class="op">(</span><span class="va">.x</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">height</span>, <span class="va">mass</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/replace.html" class="external-link">replace</a></span><span class="op">(</span><span class="va">.x</span>, <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">.x</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Pre-create sparse modeling matrix</span></span>
+<span><span class="va">starwars_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparse.model.matrix.html" class="external-link">sparse.model.matrix</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">starwars_clean</span><span class="op">)</span></span>
+<span><span class="va">starwars_y</span> <span class="op">&lt;-</span> <span class="va">starwars_clean</span><span class="op">$</span><span class="va">gender</span></span></code></pre></div>
 <p>Now that we’ve created the modeling data let’s estimate a logistic regression where <code>gender</code> is our response variable. We’ll use both the formula and matrix interfaces.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## glmSparse</span>
-
-<span class="co"># Formula interface</span>
-<span class="va">logit_formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/glmSparse.html">glmSparse</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">starwars_clean</span><span class="op">)</span>
-
-<span class="co"># Matrix interface</span>
-<span class="va">logit_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/glmSparse.html">glmSparse</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">starwars_x</span>, y <span class="op">=</span> <span class="va">starwars_y</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## glmSparse</span></span>
+<span></span>
+<span><span class="co"># Formula interface</span></span>
+<span><span class="va">logit_formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/glmSparse.html">glmSparse</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">starwars_clean</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Matrix interface</span></span>
+<span><span class="va">logit_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/glmSparse.html">glmSparse</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">starwars_x</span>, y <span class="op">=</span> <span class="va">starwars_y</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s take a quick look at a few of the most helpful methods:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Print the model</span>
-<span class="va">logit_formula</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Call:  glmSparse(formula = gender ~ ., family = binomial, data = starwars_clean)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;     (Intercept)           height             mass  hair_colorbrown  </span>
-<span class="co">#&gt;       -5.247662        -0.001529         0.063185         0.694687  </span>
-<span class="co">#&gt;  hair_colornone     hair_colorNA  hair_colorOther   skin_colorfair  </span>
-<span class="co">#&gt;        1.618806        14.583680         0.304483         0.181056  </span>
-<span class="co">#&gt; skin_colorgreen   skin_colorgrey  skin_colorlight  skin_colorOther  </span>
-<span class="co">#&gt;       17.714744         0.204344        -2.307464         0.306911  </span>
-<span class="co">#&gt;   eye_colorblue   eye_colorbrown  eye_colororange     eye_colorred  </span>
-<span class="co">#&gt;        0.845282         2.647640        17.520499        14.293584  </span>
-<span class="co">#&gt; eye_coloryellow   eye_colorOther  </span>
-<span class="co">#&gt;        2.007027         1.273756  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Degrees of Freedom: 82 Total (i.e. Null);  65 Residual</span>
-<span class="co">#&gt; Null Deviance:       84.16 </span>
-<span class="co">#&gt; Residual Deviance: 56.47     AIC: 92.47</span>
-
-<span class="co"># Get the summary of the model</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">logit_formula</span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; glmSparse(formula = gender ~ ., family = binomial, data = starwars_clean)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
-<span class="co">#&gt; -2.3899   0.0000   0.2656   0.6361   1.7203  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;                   Estimate Std. Error z value Pr(&gt;|z|)  </span>
-<span class="co">#&gt; (Intercept)     -5.248e+00  3.599e+00  -1.458   0.1448  </span>
-<span class="co">#&gt; height          -1.529e-03  1.537e-02  -0.099   0.9208  </span>
-<span class="co">#&gt; mass             6.319e-02  2.778e-02   2.275   0.0229 *</span>
-<span class="co">#&gt; hair_colorbrown  6.947e-01  1.297e+00   0.536   0.5922  </span>
-<span class="co">#&gt; hair_colornone   1.619e+00  1.348e+00   1.201   0.2296  </span>
-<span class="co">#&gt; hair_colorNA     1.458e+01  3.187e+03   0.005   0.9963  </span>
-<span class="co">#&gt; hair_colorOther  3.045e-01  1.442e+00   0.211   0.8327  </span>
-<span class="co">#&gt; skin_colorfair   1.811e-01  1.784e+00   0.101   0.9192  </span>
-<span class="co">#&gt; skin_colorgreen  1.771e+01  3.512e+03   0.005   0.9960  </span>
-<span class="co">#&gt; skin_colorgrey   2.043e-01  2.111e+00   0.097   0.9229  </span>
-<span class="co">#&gt; skin_colorlight -2.307e+00  1.749e+00  -1.319   0.1871  </span>
-<span class="co">#&gt; skin_colorOther  3.069e-01  1.513e+00   0.203   0.8392  </span>
-<span class="co">#&gt; eye_colorblue    8.453e-01  1.643e+00   0.514   0.6070  </span>
-<span class="co">#&gt; eye_colorbrown   2.648e+00  1.919e+00   1.380   0.1676  </span>
-<span class="co">#&gt; eye_colororange  1.752e+01  3.013e+03   0.006   0.9954  </span>
-<span class="co">#&gt; eye_colorred     1.429e+01  3.505e+03   0.004   0.9967  </span>
-<span class="co">#&gt; eye_coloryellow  2.007e+00  1.848e+00   1.086   0.2775  </span>
-<span class="co">#&gt; eye_colorOther   1.274e+00  1.567e+00   0.813   0.4163  </span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Null deviance: 84.164  on 82  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 56.472  on 65  degrees of freedom</span>
-<span class="co">#&gt; AIC: 92.472</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 17</span>
-
-<span class="co"># Tidy the summary of the model</span>
-<span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">logit_formula</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 18 x 5</span>
-<span class="co">#&gt;    term            estimate std.error statistic p.value</span>
-<span class="co">#&gt;    &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 (Intercept)      5.26e-3    3.60    -1.46     0.145 </span>
-<span class="co">#&gt;  2 height           9.98e-1    0.0154  -0.0995   0.921 </span>
-<span class="co">#&gt;  3 mass             1.07e+0    0.0278   2.27     0.0229</span>
-<span class="co">#&gt;  4 hair_colorbrown  2.00e+0    1.30     0.536    0.592 </span>
-<span class="co">#&gt;  5 hair_colornone   5.05e+0    1.35     1.20     0.230 </span>
-<span class="co">#&gt;  6 hair_colorNA     2.16e+6 3187.       0.00458  0.996 </span>
-<span class="co">#&gt;  7 hair_colorOther  1.36e+0    1.44     0.211    0.833 </span>
-<span class="co">#&gt;  8 skin_colorfair   1.20e+0    1.78     0.101    0.919 </span>
-<span class="co">#&gt;  9 skin_colorgreen  4.94e+7 3512.       0.00504  0.996 </span>
-<span class="co">#&gt; 10 skin_colorgrey   1.23e+0    2.11     0.0968   0.923 </span>
-<span class="co">#&gt; 11 skin_colorlight  9.95e-2    1.75    -1.32     0.187 </span>
-<span class="co">#&gt; 12 skin_colorOther  1.36e+0    1.51     0.203    0.839 </span>
-<span class="co">#&gt; 13 eye_colorblue    2.33e+0    1.64     0.514    0.607 </span>
-<span class="co">#&gt; 14 eye_colorbrown   1.41e+1    1.92     1.38     0.168 </span>
-<span class="co">#&gt; 15 eye_colororange  4.06e+7 3013.       0.00581  0.995 </span>
-<span class="co">#&gt; 16 eye_colorred     1.61e+6 3505.       0.00408  0.997 </span>
-<span class="co">#&gt; 17 eye_coloryellow  7.44e+0    1.85     1.09     0.278 </span>
-<span class="co">#&gt; 18 eye_colorOther   3.57e+0    1.57     0.813    0.416</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Print the model</span></span>
+<span><span class="va">logit_formula</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  glmSparse(formula = gender ~ ., family = binomial, data = starwars_clean)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;     (Intercept)           height             mass  hair_colorbrown  </span></span>
+<span><span class="co">#&gt;       -5.247662        -0.001529         0.063185         0.694687  </span></span>
+<span><span class="co">#&gt;  hair_colornone     hair_colorNA  hair_colorOther   skin_colorfair  </span></span>
+<span><span class="co">#&gt;        1.618806        14.583680         0.304483         0.181056  </span></span>
+<span><span class="co">#&gt; skin_colorgreen   skin_colorgrey  skin_colorlight  skin_colorOther  </span></span>
+<span><span class="co">#&gt;       17.714744         0.204344        -2.307464         0.306911  </span></span>
+<span><span class="co">#&gt;   eye_colorblue   eye_colorbrown  eye_colororange     eye_colorred  </span></span>
+<span><span class="co">#&gt;        0.845282         2.647640        17.520499        14.293584  </span></span>
+<span><span class="co">#&gt; eye_coloryellow   eye_colorOther  </span></span>
+<span><span class="co">#&gt;        2.007027         1.273756  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 82 Total (i.e. Null);  65 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       84.16 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 56.47     AIC: 92.47</span></span>
+<span></span>
+<span><span class="co"># Get the summary of the model</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">logit_formula</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; glmSparse(formula = gender ~ ., family = binomial, data = starwars_clean)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Deviance Residuals: </span></span>
+<span><span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span></span>
+<span><span class="co">#&gt; -2.3899   0.0000   0.2656   0.6361   1.7203  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;                   Estimate Std. Error z value Pr(&gt;|z|)  </span></span>
+<span><span class="co">#&gt; (Intercept)     -5.248e+00  3.599e+00  -1.458   0.1448  </span></span>
+<span><span class="co">#&gt; height          -1.529e-03  1.537e-02  -0.099   0.9208  </span></span>
+<span><span class="co">#&gt; mass             6.319e-02  2.778e-02   2.275   0.0229 *</span></span>
+<span><span class="co">#&gt; hair_colorbrown  6.947e-01  1.297e+00   0.536   0.5922  </span></span>
+<span><span class="co">#&gt; hair_colornone   1.619e+00  1.348e+00   1.201   0.2296  </span></span>
+<span><span class="co">#&gt; hair_colorNA     1.458e+01  3.187e+03   0.005   0.9963  </span></span>
+<span><span class="co">#&gt; hair_colorOther  3.045e-01  1.442e+00   0.211   0.8327  </span></span>
+<span><span class="co">#&gt; skin_colorfair   1.811e-01  1.784e+00   0.101   0.9192  </span></span>
+<span><span class="co">#&gt; skin_colorgreen  1.771e+01  3.512e+03   0.005   0.9960  </span></span>
+<span><span class="co">#&gt; skin_colorgrey   2.043e-01  2.111e+00   0.097   0.9229  </span></span>
+<span><span class="co">#&gt; skin_colorlight -2.307e+00  1.749e+00  -1.319   0.1871  </span></span>
+<span><span class="co">#&gt; skin_colorOther  3.069e-01  1.513e+00   0.203   0.8392  </span></span>
+<span><span class="co">#&gt; eye_colorblue    8.453e-01  1.643e+00   0.514   0.6070  </span></span>
+<span><span class="co">#&gt; eye_colorbrown   2.648e+00  1.919e+00   1.380   0.1676  </span></span>
+<span><span class="co">#&gt; eye_colororange  1.752e+01  3.013e+03   0.006   0.9954  </span></span>
+<span><span class="co">#&gt; eye_colorred     1.429e+01  3.505e+03   0.004   0.9967  </span></span>
+<span><span class="co">#&gt; eye_coloryellow  2.007e+00  1.848e+00   1.086   0.2775  </span></span>
+<span><span class="co">#&gt; eye_colorOther   1.274e+00  1.567e+00   0.813   0.4163  </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 84.164  on 82  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance: 56.472  on 65  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 92.472</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 17</span></span>
+<span></span>
+<span><span class="co"># Tidy the summary of the model</span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">logit_formula</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 18 x 5</span></span>
+<span><span class="co">#&gt;    term            estimate std.error statistic p.value</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 (Intercept)      5.26e-3    3.60    -1.46     0.145 </span></span>
+<span><span class="co">#&gt;  2 height           9.98e-1    0.0154  -0.0995   0.921 </span></span>
+<span><span class="co">#&gt;  3 mass             1.07e+0    0.0278   2.27     0.0229</span></span>
+<span><span class="co">#&gt;  4 hair_colorbrown  2.00e+0    1.30     0.536    0.592 </span></span>
+<span><span class="co">#&gt;  5 hair_colornone   5.05e+0    1.35     1.20     0.230 </span></span>
+<span><span class="co">#&gt;  6 hair_colorNA     2.16e+6 3187.       0.00458  0.996 </span></span>
+<span><span class="co">#&gt;  7 hair_colorOther  1.36e+0    1.44     0.211    0.833 </span></span>
+<span><span class="co">#&gt;  8 skin_colorfair   1.20e+0    1.78     0.101    0.919 </span></span>
+<span><span class="co">#&gt;  9 skin_colorgreen  4.94e+7 3512.       0.00504  0.996 </span></span>
+<span><span class="co">#&gt; 10 skin_colorgrey   1.23e+0    2.11     0.0968   0.923 </span></span>
+<span><span class="co">#&gt; 11 skin_colorlight  9.95e-2    1.75    -1.32     0.187 </span></span>
+<span><span class="co">#&gt; 12 skin_colorOther  1.36e+0    1.51     0.203    0.839 </span></span>
+<span><span class="co">#&gt; 13 eye_colorblue    2.33e+0    1.64     0.514    0.607 </span></span>
+<span><span class="co">#&gt; 14 eye_colorbrown   1.41e+1    1.92     1.38     0.168 </span></span>
+<span><span class="co">#&gt; 15 eye_colororange  4.06e+7 3013.       0.00581  0.995 </span></span>
+<span><span class="co">#&gt; 16 eye_colorred     1.61e+6 3505.       0.00408  0.997 </span></span>
+<span><span class="co">#&gt; 17 eye_coloryellow  7.44e+0    1.85     1.09     0.278 </span></span>
+<span><span class="co">#&gt; 18 eye_colorOther   3.57e+0    1.57     0.813    0.416</span></span></code></pre></div>
 <p>Finally, let’s confirm that <code>glmSparse</code> and <code>glm</code> outputs are identical.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">logit_formula</span><span class="op">)</span>,
-  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span>
-      <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">starwars_clean</span><span class="op">)</span>
-    <span class="op">)</span>
-  <span class="op">)</span>,
-  tolerance <span class="op">=</span> <span class="fl">0.05</span>
-<span class="op">)</span>
-<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">logit_formula</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">starwars_clean</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  tolerance <span class="op">=</span> <span class="fl">0.05</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="benchmark">Benchmark<a class="anchor" aria-label="anchor" href="#benchmark"></a>
 </h2>
 <p>Finally, let’s do a quick benchmark of <code>glmSparse</code> vs the alternatives.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">starwars_big</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span>
-    <span class="fl">1</span><span class="op">:</span><span class="fl">10000</span>,
-    <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="va">starwars_clean</span>
-  <span class="op">)</span>
-<span class="op">)</span>
-<span class="va">starwars_big_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparse.model.matrix.html" class="external-link">sparse.model.matrix</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">starwars_big</span><span class="op">)</span>
-<span class="va">starwars_big_y</span> <span class="op">&lt;-</span> <span class="va">starwars_big</span><span class="op">$</span><span class="va">gender</span>
-
-<span class="fu">bench</span><span class="fu">::</span><span class="fu">mark</span><span class="op">(</span>
-  <span class="fu"><a href="reference/glmSparse.html">glmSparse</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">starwars_big_x</span>, y <span class="op">=</span> <span class="va">starwars_big_y</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>,
-  <span class="fu">speedglm</span><span class="fu">::</span><span class="fu">speedglm</span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">starwars_big</span><span class="op">)</span>,
-  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">starwars_big</span><span class="op">)</span><span class="op">)</span>,
-  check <span class="op">=</span> <span class="cn">FALSE</span>, 
-  iterations <span class="op">=</span> <span class="fl">1</span>
-<span class="op">)</span> |&gt;
-  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> |&gt;
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">min</span><span class="op">:</span><span class="va">total_time</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 3 x 5</span>
-<span class="co">#&gt;        min   median `itr/sec` mem_alloc `gc/sec`</span>
-<span class="co">#&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1    13.7s    13.7s    0.0732    3.94GB    0.951</span>
-<span class="co">#&gt; 2    11.8s    11.8s    0.0844    4.49GB    1.01 </span>
-<span class="co">#&gt; 3    22.5s    22.5s    0.0444    8.89GB    1.33</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">starwars_big</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
+<span>    <span class="fl">1</span><span class="op">:</span><span class="fl">10000</span>,</span>
+<span>    <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="va">starwars_clean</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">starwars_big_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/sparse.model.matrix.html" class="external-link">sparse.model.matrix</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">starwars_big</span><span class="op">)</span></span>
+<span><span class="va">starwars_big_y</span> <span class="op">&lt;-</span> <span class="va">starwars_big</span><span class="op">$</span><span class="va">gender</span></span>
+<span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu">mark</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="reference/glmSparse.html">glmSparse</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">starwars_big_x</span>, y <span class="op">=</span> <span class="va">starwars_big_y</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>,</span>
+<span>  <span class="fu">speedglm</span><span class="fu">::</span><span class="fu">speedglm</span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">starwars_big</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">gender</span> <span class="op">~</span> <span class="va">.</span>, family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">starwars_big</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  check <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  iterations <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">min</span><span class="op">:</span><span class="va">total_time</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 x 5</span></span>
+<span><span class="co">#&gt;        min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1    18.9s    18.9s    0.0528    3.94GB    0.686</span></span>
+<span><span class="co">#&gt; 2    22.8s    22.8s    0.0438    4.49GB    0.526</span></span>
+<span><span class="co">#&gt; 3    34.5s    34.5s    0.0290    8.89GB    0.871</span></span></code></pre></div>
 </div>
 </div>
   </div>
@@ -310,7 +309,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

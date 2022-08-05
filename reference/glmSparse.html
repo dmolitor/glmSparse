@@ -22,7 +22,7 @@ underlying implementation, see MatrixModels::glm4."><!-- mathjax --><script src=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">glmSparse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9001</span>
       </span>
     </div>
 
@@ -54,26 +54,26 @@ underlying implementation, see <code><a href="https://rdrr.io/pkg/MatrixModels/m
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">glmSparse</span><span class="op">(</span>
-  formula <span class="op">=</span> <span class="cn">NULL</span>,
-  family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span>,
-  data <span class="op">=</span> <span class="cn">NULL</span>,
-  weights <span class="op">=</span> <span class="cn">NULL</span>,
-  subset <span class="op">=</span> <span class="cn">NULL</span>,
-  na.action <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.fail</a></span>,
-  start <span class="op">=</span> <span class="cn">NULL</span>,
-  etastart <span class="op">=</span> <span class="cn">NULL</span>,
-  mustart <span class="op">=</span> <span class="cn">NULL</span>,
-  offset <span class="op">=</span> <span class="cn">NULL</span>,
-  doFit <span class="op">=</span> <span class="cn">TRUE</span>,
-  control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>,
-  model <span class="op">=</span> <span class="cn">TRUE</span>,
-  contrasts <span class="op">=</span> <span class="cn">NULL</span>,
-  x <span class="op">=</span> <span class="cn">NULL</span>,
-  y <span class="op">=</span> <span class="cn">NULL</span>,
-  drop.unused.levels <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">glmSparse</span><span class="op">(</span></span>
+<span>  formula <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian</a></span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  na.action <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.fail</a></span>,</span>
+<span>  start <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  etastart <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mustart <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  doFit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  contrasts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  drop.unused.levels <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -81,64 +81,101 @@ underlying implementation, see <code><a href="https://rdrr.io/pkg/MatrixModels/m
     <dl><dt>formula</dt>
 <dd><p>An object of class <a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a>, (or one that can be
 coerced to that class): a symbolic description of the model to be fitted.</p></dd>
+
+
 <dt>family</dt>
 <dd><p>A description of the error distribution and link function to be
 used in the model. This can be a character string naming a family function,
 a family function or the result of a call to a family function. (See
 <a href="https://rdrr.io/r/stats/family.html" class="external-link">family</a> for details of family functions.)</p></dd>
+
+
 <dt>data</dt>
 <dd><p>An optional data frame, list or environment (or object coercible
 by <a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a> to a data frame) containing the variables in the
 model.</p></dd>
+
+
 <dt>weights</dt>
 <dd><p>an optional vector of ‘prior weights’ to be used in the
 fitting process. Should be NULL or a numeric vector.</p></dd>
+
+
 <dt>subset</dt>
 <dd><p>An optional vector specifying a subset of observations to be
 used in the fitting process.</p></dd>
+
+
 <dt>na.action</dt>
 <dd><p>A function which indicates what should happen when the data
 contain <code>NA</code>s. The default is set by the na.action setting of <a href="https://rdrr.io/r/base/options.html" class="external-link">options</a>,
 and is <a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.fail</a> if that is unset. The ‘factory-fresh’ default is
 <a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a>. Another possible value is <code>NULL</code>, no action. Value
 <a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.exclude</a> can be useful.</p></dd>
+
+
 <dt>start</dt>
 <dd><p>Starting values for the parameters in the linear predictor.</p></dd>
+
+
 <dt>etastart</dt>
 <dd><p>Starting values for the parameters in the predictor itself.</p></dd>
+
+
 <dt>mustart</dt>
 <dd><p>Starting values for the parameters in the vector of means.</p></dd>
+
+
 <dt>offset</dt>
 <dd><p>This can be used to specify an <em>a priori</em> known component
 to be included in the linear predictor during fitting. This should be <code>NULL</code>
 or a numeric vector of length equal to the number of cases. One or more
 offset terms can be included in the formula instead or as well, and if more
 than one is specified, their sum is used. See <a href="https://rdrr.io/r/stats/model.extract.html" class="external-link">model.offset</a>.</p></dd>
+
+
 <dt>doFit</dt>
 <dd><p>Logical indicating if the model should be fitted
 (or just returned unfitted).</p></dd>
+
+
 <dt>control</dt>
 <dd><p>A list with options on fitting; currently passed unchanged to
 (hidden) function <code>IRLS()</code>.</p></dd>
+
+
 <dt>model</dt>
 <dd><p>Currently ignored; here for back-compatibility with <a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a>.</p></dd>
+
+
 <dt>contrasts</dt>
 <dd><p>Currently ignored; here for back-compatibility with <a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a>.</p></dd>
+
+
 <dt>x</dt>
 <dd><p>Alternate interface for modeling. An already-constructed sparse
 model matrix (class 'dgCMatrix').</p></dd>
+
+
 <dt>y</dt>
 <dd><p>Alternate interface for modeling. A numeric response vector.</p></dd>
+
+
 <dt>drop.unused.levels</dt>
 <dd><p>Should factors have unused levels dropped? Defaults
 to <code>FALSE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Potentially arguments passed on to fitter functions; currently
 unused.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of class <code>glpModel</code>.</p>
+    
+
+<p>An object of class <code>glpModel</code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -159,7 +196,7 @@ the implementation.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
