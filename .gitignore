@@ -40,3 +40,7 @@ docs
 .Renviron
 .Rproj.user
 
+# renv artifacts
+.Rprofile
+renv.lock
+/renv/
