@@ -103,3 +103,35 @@ test_that("glmSparse and glm binomial models with `offset` specified are numeric
     tolerance = .01
   )
 })
+
+test_that(
+  "glmSparse and glm binomial predict numerically identical values on unlabelled data",
+  {
+    mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+    mydata$rank <- factor(mydata$rank)
+    newdata1 <- with(mydata, data.frame(gre = mean(gre), gpa = mean(gpa), rank = factor(1:4)))
+    mylogit_base <- glm(admit ~ gre + gpa + rank, data = mydata, family = "binomial")
+    mylogit_sparse <- glmSparse(admit ~ gre + gpa + rank, data = mydata, family = "binomial")
+    expect_equal(
+      predict(mylogit_base, newdata = newdata1, type = "response"),
+      predict(mylogit_sparse, newdata1, type = "response"),
+      tolerance = .001
+    )
+  }
+)
+
+test_that(
+  "glmSparse and glm binomial predict numerically identical values on unlabelled data with `offset` specified",
+  {
+    mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+    mydata$rank <- factor(mydata$rank)
+    newdata1 <- with(mydata, data.frame(gre = mean(gre), gpa = mean(gpa), rank = factor(1:4)))
+    mylogit_base <- glm(admit ~ gre + gpa + rank, data = mydata, family = "binomial", offset = rep(c(2, 3), 200))
+    mylogit_sparse <- glmSparse(admit ~ gre + gpa + rank, data = mydata, family = "binomial", offset = rep(c(2, 3), 200))
+    expect_equal(
+      predict(mylogit_base, newdata = newdata1, type = "response"),
+      predict(mylogit_sparse, newdata1, type = "response"),
+      tolerance = .001
+    )
+  }
+)

@@ -1,5 +1,6 @@
 #' @importFrom methods as is new slotNames
 #' @import Matrix MatrixModels
+#' @importFrom stats as.formula delete.response terms
 
 # Convert sparse model matrix into class `sPredModule`
 as_predModule <- function(x) {

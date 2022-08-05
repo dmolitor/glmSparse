@@ -14,6 +14,7 @@ predict_lm <- function(object,
                        type = "response",
                        weights = 1,
                        ...) {
+  tt <- terms(as.formula(object@call$formula))
   if (se.fit) {
     stop("`se.fit` == TRUE is not currently supported, sorry :(", call. = FALSE)
   }
@@ -27,6 +28,7 @@ predict_lm <- function(object,
     X <- pred_matrix(object)
     offset <- object@resp@offset
   } else {
+    tt <- delete.response(tt)
     model_formula <- reconstruct_formula(object)
     if (!is.null(model_formula)) {
       stopifnot(length(model_formula) == 3)
@@ -40,14 +42,13 @@ predict_lm <- function(object,
       varnames <- colnames(X)
       stopifnot(!is.null(varnames))
     }
-    off.num <- object@resp@offset
     offset <- rep(0, nrow(X))
-    ## TODO: Add tests to see if this is important
-    # if (!identical(off.num, offset)) {
-    #   for (i in off.num) offset <- offset + eval(attr(tt, "variables")[[i + 1]], newdata)
-    # }
-    if (!identical(off.num, offset)) {
-      offset <- offset + eval(off.num, newdata)
+    if (!is.null(off.num <- attr(tt, "offset")))
+      for (i in off.num) {
+        offset <- offset + newdata[, attr(tt, "variables")[[i + 1]]]
+      }
+    if (!is.null(object@call$offset))  {
+      offset <- offset + eval(object@call$offset)
     }
   }
   df.null <- object@pred@X@Dim[[1L]] - 1L
@@ -127,7 +128,7 @@ predict.glpModel <- predict.glpModel <- function(object,
 
 # Create prediction matrix
 pred_matrix <- function(object, newdata = NULL, ...) {
-  model_formula <- reconstruct_formula(object)
+  model_formula <- reconstruct_formula(object, keep.lhs = FALSE)
   if (is.null(newdata)) {
     return(as(object@pred@X, "CsparseMatrix"))
   } else if (is.null(model_formula)) {
@@ -145,9 +146,12 @@ pred_matrix <- function(object, newdata = NULL, ...) {
 }
 
 # Reconstruct formula
-reconstruct_formula <- function(object) {
+reconstruct_formula <- function(object, keep.lhs = TRUE) {
   model_call <- object@call
   if (!is.null(model_call$data)) {
+    if (length(model_call$formula) > 2 && !keep.lhs) {
+      return(model_call$formula[-2])
+    }
     return(model_call$formula)
   }
   NULL
